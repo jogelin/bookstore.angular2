@@ -1,6 +1,8 @@
+import { AppStore } from './../services/app.store';
 import { NgModule }      from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule }   from '@angular/forms';
+import { HttpModule } from '@angular/http';
 
 import { RoutesModule } from './app.routing';
 
@@ -20,14 +22,17 @@ import { BookSearchComponent } from '../book-search/book-search.component';
     BrowserModule,
     FormsModule,
     InMemoryWebApiModule.forRoot(InMemoryDataService),
+    RoutesModule,
+    HttpModule
        ],
   declarations: [
+    AppComponent,
     DashboardComponent,
     BooksComponent,
     BookDetailComponent,
     BookSearchComponent,
   ],
-  providers: [ AppService ],
+  providers: [ AppService, AppStore ],
   bootstrap: [ AppComponent ]
 })
 export class AppModule { }

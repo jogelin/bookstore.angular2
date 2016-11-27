@@ -1,40 +1,82 @@
+import { Subject } from 'rxjs/Subject';
+import { Observable } from 'rxjs/Observable';
 import { Injectable } from '@angular/core';
 import { Book } from '../types/book';
-import { Http, Headers } from '@angular/http';
+import { Http, Headers, Response } from '@angular/http';
+import { AppStore, ActionTypes } from './../services/app.store';
 import 'rxjs/add/operator/toPromise';
 
 @Injectable()
 export class AppService {
   bookApiUrl: string = 'app/books';
-  private headers = new Headers({'Content-Type': 'application/json'});
+  private headers = new Headers({ 'Content-Type': 'application/json' });
 
-  constructor() {}
+  constructor(private http: Http, private appStore: AppStore) { }
 
-  getBooks(): Promise<Book[]> {
-    throw new Error('not implemented');
+  getBooks(): void {
+    this.http.get(this.bookApiUrl)
+      .map((res: Response) => res.json().data as Book[])
+      .catch(this.handleObservableError)
+      .subscribe((books) =>
+        this.appStore.store.dispatch({
+          type: ActionTypes.GET_BOOKS,
+          books: books
+        }));
   }
 
-  update(book: Book): Promise<Book> {
+  update(book: Book): void {
     const url = `${this.bookApiUrl}/${book.id}`;
-    throw new Error('not implemented');
+    this.http.put(url, book)
+      .catch(this.handleObservableError)
+      .subscribe(() =>
+        this.appStore.store.dispatch({
+          type: ActionTypes.UPDATE_BOOK,
+          book: book
+        }));
   }
 
-  create(title: string): Promise<Book> {
-    throw new Error('not implemented');
+  create(title: string): void {
+    const newBook = {
+      id: 777,
+      title: title,
+      category: 'web'
+    };
+
+    this.http.post(this.bookApiUrl, newBook)
+      .catch(this.handleObservableError)
+      .subscribe(() =>
+        this.appStore.store.dispatch({
+          type: ActionTypes.ADD_BOOK,
+          book: newBook
+        }));
   }
 
-  delete(id: number): Promise<void> {
+  delete(id: number): void {
     const url = `${this.bookApiUrl}/${id}`;
-    throw new Error('not implemented');
+    this.http.delete(url)
+      .catch(this.handleObservableError)
+      .subscribe(() =>
+        this.appStore.store.dispatch({
+          type: ActionTypes.DELETE_BOOK,
+          bookId: id
+        }));
   }
 
+  getBook(id: number): void {
+    const url = `${this.bookApiUrl}/${id}`;
+    this.http.get(url)
+      .map((res: Response) => res.json().data as Book[])
+      .catch(this.handleObservableError)
+      .subscribe((book) =>
+        this.appStore.store.dispatch({
+          type: ActionTypes.GET_BOOK,
+          book: book
+        }));
+  }
 
-  private handleError(error: any): Promise<any> {
+  private handleObservableError(error: any): Observable<any> {
     console.error('An error occurred', error);
-    return Promise.reject(error.message || error);
+    return Observable.throw(error.json().error || 'Server error');
   }
 
-  getBook(id: number): Promise<Book> {
-    throw new Error('not implemented');
-  }
 }

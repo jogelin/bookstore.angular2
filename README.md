@@ -26,3 +26,6 @@
 
 - Angular-CLI
   - Productivity tools
+
+
+  - interface isMatching(action: Action):true|false && run(state): State

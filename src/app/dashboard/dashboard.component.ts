@@ -1,6 +1,10 @@
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { AppService } from './../services/app.service';
+import { AppStore, ActionTypes, IAppState } from './../services/app.store';
+import { Observable } from 'rxjs/Observable';
+import { Http } from '@angular/http';
 import { Component, OnInit } from '@angular/core';
 import { Book } from '../types/book';
-import { AppService } from '../services/app.service';
 
 @Component({
   styleUrls: ['dashboard.component.css'],
@@ -9,11 +13,13 @@ import { AppService } from '../services/app.service';
 })
 export class DashboardComponent implements OnInit {
 
-  books: Book[] = [];
+  books$: Observable<Book[]>;
 
-  constructor() { }
+  constructor(private appService: AppService, private appStore: AppStore) { }
 
   ngOnInit(): void {
     // Get all the books
+    this.appService.getBooks();
+    this.books$ = this.appStore.state$.map((state) => state.books);
   }
 }

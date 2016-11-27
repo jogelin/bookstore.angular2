@@ -15,8 +15,8 @@ import { Observable } from 'rxjs';
 })
 export class AppComponent {
   title = 'Amazon by Hackages';
-  
-  ngOnInit(){
-    console.log(Observable)
+
+  ngOnInit() {
+    //console.log(Observable)
   }
 }
